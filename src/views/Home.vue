@@ -140,7 +140,12 @@ export default class Home extends Vue {
       }
       return;
     }
-    pilots[index].channelIndex = 0;
+
+    if (index > 0 && pilots[index - 1].technology === pilots[index].technology) {
+      pilots[index].channelIndex = pilots[index - 1].channelIndex + 1;
+    } else {
+      pilots[index].channelIndex = 0;
+    }
     while (pilots[index].channelIndex < pilots[index].channels.length) {
       if (this.isDifferencesBetter(pilots, index)) {
         this.setBest(pilots, index + 1);
