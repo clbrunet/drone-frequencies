@@ -1,17 +1,18 @@
 <template>
   <div class="home">
-    <form class="pilots-form" @submit.prevent="setPilots">
+    <form class="pilots-form" @submit.prevent="formProcessing">
       <label for="DJIPilots">DJI pilots :</label>
       <input type="number" id="DJIPilots" name="DJIPilots"
-        min="0" v-model.number="DJIPilots">
+        min="0" max="8" v-model.number="DJIPilots">
       <label for="sharkbytePilots">Sharkbyte pilots :</label>
       <input type="number" id="sharkbytePilots" name="sharkbytePilots"
-        min="0" v-model.number="sharkbytePilots">
+        min="0" max="8" v-model.number="sharkbytePilots">
       <label for="analogPilots">Analog pilots :</label>
       <input type="number" id="analogPilots" name="analogPilots"
-        min="0" v-model.number="analogPilots">
+        min="0" max="8" v-model.number="analogPilots">
       <input type="submit" value="Submit">
     </form>
+    <p v-if="formError != ''" class="form-error">{{ formError }}</p>
     <div class="result">
       <ul>
         <li v-for="(pilot, index) in best.pilots" :key="index">
@@ -98,6 +99,8 @@ export default class Home extends Vue {
   sharkbytePilots = 0;
   analogPilots = 0;
 
+  formError = "";
+
   best: { smallestDifference: number, pilots: Pilot[] } = {
     smallestDifference: 25,
     pilots: [],
@@ -146,12 +149,13 @@ export default class Home extends Vue {
     }
   }
 
-  setPilots(): void {
-    if (this.DJIPilots + this.sharkbytePilots + this.analogPilots < 2) {
-      // @todo display error
-      console.log("must be 2 pilots");
+  formProcessing(): void {
+    const pilotsCount = this.DJIPilots + this.sharkbytePilots + this.analogPilots;
+    if (pilotsCount < 2 || 8 < pilotsCount) {
+      this.formError = "The number of pilots must be between 2 and 8.";
       return;
     }
+    this.formError = "";
     let pilots: Pilot[] = [];
     for (let i = 0; i < this.DJIPilots; i++) {
       pilots.push({ technology: "DJI", number: i + 1,
@@ -173,7 +177,6 @@ export default class Home extends Vue {
 </script>
 
 <style scoped>
-
 .home {
   box-sizing: border-box;
   width: 100%;
@@ -193,6 +196,10 @@ export default class Home extends Vue {
 
 .pilots-form * {
   margin: 5px;
+}
+
+.form-error {
+  color: red;
 }
 
 .result {
@@ -215,5 +222,6 @@ export default class Home extends Vue {
 
 .chart-img {
   width: 100%;
+  max-width: 1000px;
 }
 </style>
