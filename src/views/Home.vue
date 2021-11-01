@@ -1,18 +1,219 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+    <form class="pilots-form" @submit.prevent="setPilots">
+      <label for="DJIPilots">DJI pilots :</label>
+      <input type="number" id="DJIPilots" name="DJIPilots"
+        min="0" v-model.number="DJIPilots">
+      <label for="sharkbytePilots">Sharkbyte pilots :</label>
+      <input type="number" id="sharkbytePilots" name="sharkbytePilots"
+        min="0" v-model.number="sharkbytePilots">
+      <label for="analogPilots">Analog pilots :</label>
+      <input type="number" id="analogPilots" name="analogPilots"
+        min="0" v-model.number="analogPilots">
+      <input type="submit" value="Submit">
+    </form>
+    <div class="result">
+      <ul>
+        <li v-for="(pilot, index) in best.pilots" :key="index">
+          {{ pilot.technology }} {{ pilot.number }} : channel {{ pilot.channels[pilot.channelIndex].name }},
+          frequency {{ pilot.channels[pilot.channelIndex].frequency }}
+        </li>
+      </ul>
+    </div>
+    <img class="chart-img" src="https://oscarliang.com/ctt/uploads/2021/03/5.8ghz-fpv-channels-chart-diagram-frequency-analog-digital-dji-sharkbyte-05-21.jpg"
+      alt="channels chart">
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
 
-@Component({
-  components: {
-    HelloWorld,
-  },
-})
-export default class Home extends Vue {}
+type Pilot = {
+  technology: "DJI" | "Sharkbyte" | "Analog";
+  number: number;
+  channels: { readonly name: string, readonly frequency: number }[];
+  channelIndex: number;
+};
+
+@Component
+export default class Home extends Vue {
+  readonly DJIChannels = [
+    { name: "1", frequency: 5660 },
+    { name: "2", frequency: 5695 },
+    { name: "3", frequency: 5735 },
+    { name: "4", frequency: 5770 },
+    { name: "5", frequency: 5805 },
+    { name: "8", frequency: 5839 },
+    { name: "6", frequency: 5878 },
+    { name: "7", frequency: 5914 },
+  ];
+
+  readonly sharkbyteChannels = [
+    { name: "1", frequency: 5660 },
+    { name: "2", frequency: 5695 },
+    { name: "3", frequency: 5735 },
+    { name: "4", frequency: 5770 },
+    { name: "5", frequency: 5805 },
+    { name: "6", frequency: 5839 },
+    { name: "7", frequency: 5878 },
+    { name: "8", frequency: 5914 },
+  ];
+
+  readonly analogChannels = [
+    { name: "R1", frequency: 5658 },
+    { name: "R2", frequency: 5695 },
+    { name: "A8", frequency: 5725 },
+    { name: "R3", frequency: 5732 },
+    { name: "B1", frequency: 5733 },
+    { name: "F1", frequency: 5740 },
+    { name: "A7", frequency: 5745 },
+    { name: "B2", frequency: 5752 },
+    { name: "F2", frequency: 5760 },
+    { name: "A6", frequency: 5765 },
+    { name: "R4", frequency: 5769 },
+    { name: "B3", frequency: 5771 },
+    { name: "F3", frequency: 5780 },
+    { name: "A5", frequency: 5785 },
+    { name: "B4", frequency: 5790 },
+    { name: "F4", frequency: 5800 },
+    { name: "A4", frequency: 5805 },
+    { name: "R5", frequency: 5806 },
+    { name: "B5", frequency: 5809 },
+    { name: "F5", frequency: 5820 },
+    { name: "A3", frequency: 5825 },
+    { name: "B6", frequency: 5828 },
+    { name: "F6", frequency: 5840 },
+    { name: "R6", frequency: 5843 },
+    { name: "A2", frequency: 5845 },
+    { name: "B7", frequency: 5847 },
+    { name: "F7", frequency: 5860 },
+    { name: "A1", frequency: 5865 },
+    { name: "B8", frequency: 5866 },
+    { name: "R7", frequency: 5880 },
+    { name: "F8", frequency: 5880 },
+    { name: "R8", frequency: 5917 },
+  ];
+
+  DJIPilots = 0;
+  sharkbytePilots = 0;
+  analogPilots = 0;
+
+  best: { smallestDifference: number, pilots: Pilot[] } = {
+    smallestDifference: 25,
+    pilots: [],
+  };
+
+  getSmallestDifference(pilots: Pilot[]): number {
+    let smallestDifference = Infinity;
+    for (let i = 0; i < pilots.length; i++) {
+      for (let j = i + 1; j < pilots.length; j++) {
+        const difference = Math.abs(pilots[i].channels[pilots[i].channelIndex].frequency
+          - pilots[j].channels[pilots[j].channelIndex].frequency);
+        if (difference < smallestDifference) {
+          smallestDifference = difference;
+        }
+      }
+    }
+    return smallestDifference;
+  }
+
+  isDifferencesBetter(pilots: Pilot[], index: number): boolean {
+    for (let i = 0; i < index; i++) {
+      if (Math.abs(pilots[i].channels[pilots[i].channelIndex].frequency
+        - pilots[index].channels[pilots[index].channelIndex].frequency)
+        < this.best.smallestDifference) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  setBest(pilots: Pilot[], index: number): void {
+    if (index >= this.DJIPilots + this.sharkbytePilots + this.analogPilots) {
+      let smallestDifference = this.getSmallestDifference(pilots);
+      if (smallestDifference > this.best.smallestDifference) {
+        this.best.smallestDifference = smallestDifference;
+        this.best.pilots = JSON.parse(JSON.stringify(pilots));
+      }
+      return;
+    }
+    pilots[index].channelIndex = 0;
+    while (pilots[index].channelIndex < pilots[index].channels.length) {
+      if (this.isDifferencesBetter(pilots, index)) {
+        this.setBest(pilots, index + 1);
+      }
+      pilots[index].channelIndex++;
+    }
+  }
+
+  setPilots(): void {
+    if (this.DJIPilots + this.sharkbytePilots + this.analogPilots < 2) {
+      // @todo display error
+      console.log("must be 2 pilots");
+      return;
+    }
+    let pilots: Pilot[] = [];
+    for (let i = 0; i < this.DJIPilots; i++) {
+      pilots.push({ technology: "DJI", number: i + 1,
+                  channels: this.DJIChannels, channelIndex: 0 });
+    }
+    for (let i = 0; i < this.sharkbytePilots; i++) {
+      pilots.push({ technology: "Sharkbyte", number: i + 1,
+                  channels: this.sharkbyteChannels, channelIndex: 0 });
+    }
+    for (let i = 0; i < this.analogPilots; i++) {
+      pilots.push({ technology: "Analog", number: i + 1,
+                  channels: this.analogChannels, channelIndex: 0 });
+    }
+    this.best.smallestDifference = 25;
+    this.best.pilots = [];
+    this.setBest(pilots, 0);
+  }
+}
 </script>
+
+<style scoped>
+
+.home {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pilots-form {
+  display: flex;
+  flex-direction: column;
+  align-items:center;
+  justify-content: center;
+}
+
+.pilots-form * {
+  margin: 5px;
+}
+
+.result {
+  display: flex;
+  flex-direction: column;
+  align-items:center;
+  justify-content: center;
+}
+
+.result ul {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+.result li {
+  list-style-type: none;
+  margin: 5px;
+}
+
+.chart-img {
+  width: 100%;
+}
+</style>
