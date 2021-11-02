@@ -19,10 +19,10 @@
     </form>
     <p v-if="formError != ''" class="form-error">{{ formError }}</p>
     <div class="result">
-      <p v-if="best.pilots.length > 0" >Smallest difference without IMD :
-      {{ best.smallestDifference }}MHz</p>
-      <p v-if="best.pilots.length > 0 && shouldCheckIMD" >Smallest difference with IMD :
-      {{ best.smallestIMDDifference }}MHz</p>
+      <div v-if="best.pilots.length > 0" class="differences">
+        <p>Smallest difference without IMD : {{ best.smallestDifference }}MHz</p>
+        <p v-if="shouldCheckIMD" >Smallest difference with IMD : {{ best.smallestIMDDifference }}MHz</p>
+      </div>
       <ul>
         <li v-for="(pilot, index) in best.pilots" :key="index">
           {{ pilot.technology }} {{ pilot.number }} : channel {{ pilot.channels[pilot.channelIndex].name }},
@@ -32,6 +32,7 @@
     </div>
     <img class="chart-img" src="https://oscarliang.com/ctt/uploads/2021/03/5.8ghz-fpv-channels-chart-diagram-frequency-analog-digital-dji-sharkbyte-05-21.jpg"
       alt="channels chart">
+    <a href="https://oscarliang.com/fpv-channels/" target="_blank">https://oscarliang.com/fpv-channels/</a>
   </div>
 </template>
 
@@ -234,11 +235,11 @@ export default class Home extends Vue {
 
 <style scoped>
 p {
-  margin: 10px;
+  margin: 5px;
 }
 
 ul {
-  margin: 10px;
+  margin: 5px;
 }
 
 .home {
@@ -275,6 +276,10 @@ ul {
   flex-direction: column;
   align-items:center;
   justify-content: center;
+}
+
+.result .differences {
+  margin: 5px;
 }
 
 .result ul {
