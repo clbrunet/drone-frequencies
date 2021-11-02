@@ -2,14 +2,26 @@
   <div class="home">
     <form class="pilots-form" @submit.prevent="formProcessing">
       <label for="DJIPilots">DJI pilots :</label>
-      <input type="number" id="DJIPilots" name="DJIPilots"
+      <div class="number-input">
+        <img src="@/assets/minus-96.png" alt="minus" class="minus" @click="DJIPilots > 0 ? DJIPilots-- : 0">
+        <input type="number" id="DJIPilots" name="DJIPilots"
         min="0" max="8" v-model.number="DJIPilots">
+        <img src="@/assets/plus-96.png" alt="plus" class="plus" @click="DJIPilots < 8 ? DJIPilots++ : 0">
+      </div>
       <label for="sharkbytePilots">Sharkbyte pilots :</label>
-      <input type="number" id="sharkbytePilots" name="sharkbytePilots"
+      <div class="number-input">
+        <img src="@/assets/minus-96.png" alt="minus" class="minus" @click="sharkbytePilots > 0 ? sharkbytePilots-- : 0">
+        <input type="number" id="sharkbytePilots" name="sharkbytePilots"
         min="0" max="8" v-model.number="sharkbytePilots">
+        <img src="@/assets/plus-96.png" alt="plus" class="plus" @click="sharkbytePilots < 8 ? sharkbytePilots++ : 0">
+      </div>
       <label for="analogPilots">Analog pilots :</label>
-      <input type="number" id="analogPilots" name="analogPilots"
+      <div class="number-input">
+        <img src="@/assets/minus-96.png" alt="minus" class="minus" @click="analogPilots > 0 ? analogPilots-- : 0">
+        <input type="number" id="analogPilots" name="analogPilots"
         min="0" max="8" v-model.number="analogPilots">
+        <img src="@/assets/plus-96.png" alt="plus" class="plus" @click="analogPilots < 8 ? analogPilots++ : 0">
+      </div>
       <div class="IMD">
       <label for="shouldCheckIMD">Calculate IMDs(inter-modulation distortions) : </label>
       <input type="checkbox" id="shouldCheckIMD" name="shouldCheckIMD"
@@ -265,6 +277,20 @@ a {
 
 .pilots-form * {
   margin: 5px 0px;
+}
+
+.pilots-form .number-input {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-items: center;
+}
+
+.minus, .plus {
+  width: 30px;
+  height: 30px;
+  padding: 5px;
+  margin: 0px 5px;
 }
 
 .IMD {
