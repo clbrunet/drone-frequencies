@@ -10,14 +10,23 @@
       <label for="analogPilots">Analog pilots :</label>
       <input type="number" id="analogPilots" name="analogPilots"
         min="0" max="8" v-model.number="analogPilots">
+      <div class="IMD">
+      <label for="shouldCheckIMD">Calculate IMDs(inter-modulation distortions) :</label>
+      <input type="checkbox" id="shouldCheckIMD" name="shouldCheckIMD"
+        v-model="shouldCheckIMD" @change="onShouldCheckIMDChange">
+      </div>
       <input type="submit" value="Submit">
     </form>
     <p v-if="formError != ''" class="form-error">{{ formError }}</p>
     <div class="result">
+      <p v-if="best.pilots.length > 0" >Smallest difference without IMD :
+      {{ best.smallestDifference }}MHz</p>
+      <p v-if="best.pilots.length > 0 && shouldCheckIMD" >Smallest difference with IMD :
+      {{ best.smallestIMDDifference }}MHz</p>
       <ul>
         <li v-for="(pilot, index) in best.pilots" :key="index">
           {{ pilot.technology }} {{ pilot.number }} : channel {{ pilot.channels[pilot.channelIndex].name }},
-          frequency {{ pilot.channels[pilot.channelIndex].frequency }}
+          frequency {{ pilot.channels[pilot.channelIndex].frequency }}MHz
         </li>
       </ul>
     </div>
@@ -98,20 +107,47 @@ export default class Home extends Vue {
   DJIPilots = 0;
   sharkbytePilots = 0;
   analogPilots = 0;
+  shouldCheckIMD = true;
 
   formError = "";
 
-  best: { smallestDifference: number, pilots: Pilot[] } = {
-    smallestDifference: 25,
+  best: { smallestDifference: number, smallestIMDDifference: number, pilots: Pilot[] } = {
+    smallestDifference: -1,
+    smallestIMDDifference: -1,
     pilots: [],
   };
+
+  getSmallestIMDDifference(pilots: Pilot[]): number {
+    let smallestIMDDifference = Infinity;
+    for (let i = 0; i < pilots.length; i++) {
+      for (let j = i + 1; j < pilots.length; j++) {
+        const firstIMD = pilots[i].channels[pilots[i].channelIndex].frequency * 2
+          - pilots[j].channels[pilots[j].channelIndex].frequency;
+        const secondIMD = pilots[j].channels[pilots[j].channelIndex].frequency * 2
+          - pilots[i].channels[pilots[i].channelIndex].frequency;
+        for (let k = 0; k < pilots.length; k++) {
+          const firstDifference = Math.abs(firstIMD
+              - pilots[k].channels[pilots[k].channelIndex].frequency);
+          const secondDifference = Math.abs(secondIMD
+              - pilots[k].channels[pilots[k].channelIndex].frequency);
+          if (firstDifference < smallestIMDDifference) {
+            smallestIMDDifference = firstDifference;
+          }
+          if (secondDifference < smallestIMDDifference) {
+            smallestIMDDifference = secondDifference;
+          }
+        }
+      }
+    }
+    return smallestIMDDifference;
+  }
 
   getSmallestDifference(pilots: Pilot[]): number {
     let smallestDifference = Infinity;
     for (let i = 0; i < pilots.length; i++) {
       for (let j = i + 1; j < pilots.length; j++) {
         const difference = Math.abs(pilots[i].channels[pilots[i].channelIndex].frequency
-          - pilots[j].channels[pilots[j].channelIndex].frequency);
+            - pilots[j].channels[pilots[j].channelIndex].frequency);
         if (difference < smallestDifference) {
           smallestDifference = difference;
         }
@@ -123,8 +159,8 @@ export default class Home extends Vue {
   isDifferencesBetter(pilots: Pilot[], index: number): boolean {
     for (let i = 0; i < index; i++) {
       if (Math.abs(pilots[i].channels[pilots[i].channelIndex].frequency
-        - pilots[index].channels[pilots[index].channelIndex].frequency)
-        < this.best.smallestDifference) {
+            - pilots[index].channels[pilots[index].channelIndex].frequency)
+          < this.best.smallestDifference) {
         return false;
       }
     }
@@ -134,8 +170,18 @@ export default class Home extends Vue {
   setBest(pilots: Pilot[], index: number): void {
     if (index >= this.DJIPilots + this.sharkbytePilots + this.analogPilots) {
       let smallestDifference = this.getSmallestDifference(pilots);
-      if (smallestDifference > this.best.smallestDifference) {
+      if (this.shouldCheckIMD == false) {
+        if (smallestDifference > this.best.smallestDifference) {
+          this.best.smallestDifference = smallestDifference;
+          this.best.pilots = JSON.parse(JSON.stringify(pilots));
+        }
+        return;
+      }
+      let smallestIMDDifference = this.getSmallestIMDDifference(pilots);
+      if (smallestDifference >= this.best.smallestDifference
+          && smallestIMDDifference >= this.best.smallestIMDDifference) {
         this.best.smallestDifference = smallestDifference;
+        this.best.smallestIMDDifference = smallestIMDDifference;
         this.best.pilots = JSON.parse(JSON.stringify(pilots));
       }
       return;
@@ -164,24 +210,37 @@ export default class Home extends Vue {
     let pilots: Pilot[] = [];
     for (let i = 0; i < this.DJIPilots; i++) {
       pilots.push({ technology: "DJI", number: i + 1,
-                  channels: this.DJIChannels, channelIndex: 0 });
+          channels: this.DJIChannels, channelIndex: 0 });
     }
     for (let i = 0; i < this.sharkbytePilots; i++) {
       pilots.push({ technology: "Sharkbyte", number: i + 1,
-                  channels: this.sharkbyteChannels, channelIndex: 0 });
+          channels: this.sharkbyteChannels, channelIndex: 0 });
     }
     for (let i = 0; i < this.analogPilots; i++) {
       pilots.push({ technology: "Analog", number: i + 1,
-                  channels: this.analogChannels, channelIndex: 0 });
+          channels: this.analogChannels, channelIndex: 0 });
     }
     this.best.smallestDifference = 25;
+    this.best.smallestIMDDifference = -1;
     this.best.pilots = [];
     this.setBest(pilots, 0);
+  }
+
+  onShouldCheckIMDChange(): void {
+    this.best.smallestIMDDifference = this.getSmallestIMDDifference(this.best.pilots);
   }
 }
 </script>
 
 <style scoped>
+p {
+  margin: 10px;
+}
+
+ul {
+  margin: 10px;
+}
+
 .home {
   box-sizing: border-box;
   width: 100%;
@@ -201,6 +260,10 @@ export default class Home extends Vue {
 
 .pilots-form * {
   margin: 5px;
+}
+
+.IMD {
+  flex-direction: row;
 }
 
 .form-error {
