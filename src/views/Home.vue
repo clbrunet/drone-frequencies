@@ -11,22 +11,22 @@
       <input type="number" id="analogPilots" name="analogPilots"
         min="0" max="8" v-model.number="analogPilots">
       <div class="IMD">
-      <label for="shouldCheckIMD">Calculate IMDs(inter-modulation distortions) :</label>
+      <label for="shouldCheckIMD">Calculate IMDs(inter-modulation distortions) : </label>
       <input type="checkbox" id="shouldCheckIMD" name="shouldCheckIMD"
         v-model="shouldCheckIMD" @change="onShouldCheckIMDChange">
       </div>
       <input type="submit" value="Submit">
     </form>
     <p v-if="formError != ''" class="form-error">{{ formError }}</p>
-    <div class="result">
-      <div v-if="best.pilots.length > 0" class="differences">
+    <div v-if="best.pilots.length > 0" class="result">
+      <div class="differences">
         <p>Smallest difference without IMD : {{ best.smallestDifference }}MHz</p>
         <p v-if="shouldCheckIMD" >Smallest difference with IMD : {{ best.smallestIMDDifference }}MHz</p>
       </div>
       <ul>
         <li v-for="(pilot, index) in best.pilots" :key="index">
           {{ pilot.technology }} {{ pilot.number }} : channel {{ pilot.channels[pilot.channelIndex].name }},
-          frequency {{ pilot.channels[pilot.channelIndex].frequency }}MHz
+          {{ pilot.channels[pilot.channelIndex].frequency }}MHz
         </li>
       </ul>
     </div>
@@ -235,11 +235,15 @@ export default class Home extends Vue {
 
 <style scoped>
 p {
-  margin: 5px;
+  margin: 5px 0px;
 }
 
 ul {
-  margin: 5px;
+  margin: 5px 0px;
+}
+
+a {
+  margin: 5px 0px;
 }
 
 .home {
@@ -260,7 +264,7 @@ ul {
 }
 
 .pilots-form * {
-  margin: 5px;
+  margin: 5px 0px;
 }
 
 .IMD {
@@ -279,7 +283,7 @@ ul {
 }
 
 .result .differences {
-  margin: 5px;
+  margin: 5px 0px;
 }
 
 .result ul {
@@ -290,11 +294,12 @@ ul {
 
 .result li {
   list-style-type: none;
-  margin: 5px;
+  margin: 5px 0px;
 }
 
 .chart-img {
   width: 100%;
   max-width: 1000px;
+  margin: 5px 0px;
 }
 </style>
