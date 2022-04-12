@@ -5,8 +5,8 @@
       <div class="number-input">
         <img src="@/assets/minus-96.png" alt="minus" class="minus" @click="DJIPilots > 0 ? DJIPilots-- : 0">
         <input type="number" id="DJIPilots" name="DJIPilots"
-        min="0" max="8" v-model.number="DJIPilots">
-        <img src="@/assets/plus-96.png" alt="plus" class="plus" @click="DJIPilots < 8 ? DJIPilots++ : 0">
+        min="0" max="7" v-model.number="DJIPilots">
+        <img src="@/assets/plus-96.png" alt="plus" class="plus" @click="DJIPilots < 7 ? DJIPilots++ : 0">
       </div>
       <label for="sharkbytePilots">Sharkbyte pilots :</label>
       <div class="number-input">
@@ -66,7 +66,8 @@ export default class Home extends Vue {
     { name: "3", frequency: 5735 },
     { name: "4", frequency: 5770 },
     { name: "5", frequency: 5805 },
-    { name: "8", frequency: 5839 },
+    // removed channel
+    // { name: "8", frequency: 5839 },
     { name: "6", frequency: 5878 },
     { name: "7", frequency: 5914 },
   ];
