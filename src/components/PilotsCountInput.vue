@@ -1,6 +1,7 @@
 <template>
   <div class="pilots-count-input">
-    <label :for="inputName">{{ pilotsCountKey }} pilots count :</label>
+    <label :for="inputName">{{ pilotsCountKey.charAt(0).toUpperCase() + pilotsCountKey.slice(1) }}
+      pilots count :</label>
     <div class="number-input">
       <img src="@/assets/minus-96.png" alt="minus" class="minus" @click="decrementCount">
       <input type="number" :id="inputName" :name="inputName"
