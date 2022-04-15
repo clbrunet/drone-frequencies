@@ -55,11 +55,11 @@ export default class PilotsCountInput extends Vue {
 </script>
 
 <style scoped>
-.pilots-form * {
+.pilots-count-input * {
   margin: 5px 0px;
 }
 
-.pilots-form .number-input {
+.pilots-count-input .number-input {
   display: flex;
   flex-direction: row;
   align-items: center;

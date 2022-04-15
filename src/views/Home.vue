@@ -280,20 +280,6 @@ a {
   margin: 5px 0px;
 }
 
-.pilots-form .number-input {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-items: center;
-}
-
-.minus, .plus {
-  width: 30px;
-  height: 30px;
-  padding: 5px;
-  margin: 0px 5px;
-}
-
 .IMD {
   flex-direction: row;
 }
