@@ -9,7 +9,7 @@
         <input type="checkbox" id="shouldCheckIMD" name="shouldCheckIMD"
           v-model="shouldCheckIMD" @change="onShouldCheckIMDChanged">
       </div>
-      <input type="submit" value="Submit">
+      <input class="pilots-form-submit" type="submit" value="Submit">
     </form>
     <p v-if="formError != ''" class="form-error">{{ formError }}</p>
     <div v-if="best.pilots.length > 0" class="result">
@@ -280,6 +280,20 @@ a {
   margin: 5px 0px;
 }
 
+.pilots-form-submit {
+  font-weight: bold;
+  padding: 10px;
+  /* background-color: #87CEEB; */
+  border-color: none;
+  border-radius: 15px;
+  /* box-shadow: 0px 0px 10px #00A5E7; */
+  box-shadow: 0px 0px 10px black;
+  border-style: solid;
+  border-width: 0px;
+  /* border-color: #00A5E7; */
+  cursor: pointer;
+}
+
 .IMD {
   flex-direction: row;
 }
@@ -312,7 +326,7 @@ a {
 
 .chart-img {
   width: 100%;
-  max-width: 1000px;
+  max-width: 900px;
   margin: 5px 0px;
 }
 </style>

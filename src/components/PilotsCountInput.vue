@@ -67,11 +67,20 @@ export default class PilotsCountInput extends Vue {
   justify-items: center;
 }
 
+.number-input input {
+  border-radius: 5px;
+  /* border-color: #87CEEB; */
+  border-style: solid;
+  /* box-shadow: 0 0 2px #87CEEB; */
+  box-shadow: 0 0 2px black;
+}
+
 .minus, .plus {
   width: 30px;
   height: 30px;
   padding: 5px;
   margin: 0px 5px;
+  /* filter: invert(74%) sepia(66%) saturate(6232%) hue-rotate(164deg) brightness(95%) contrast(101%); */
 }
 
 </style>
