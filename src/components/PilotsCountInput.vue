@@ -4,47 +4,38 @@
     <div class="number-input">
       <img src="@/assets/minus-96.png" alt="minus" class="minus" @click="decrementCount">
       <input type="number" :id="inputName" :name="inputName"
-        min="0" :max="maxPilotsCount" v-model.number="pilotsCount" @change="onInputChanged">
+        min="0" :max="maxPilotsCount" v-model.number="pilotsCount">
       <img src="@/assets/plus-96.png" alt="plus" class="plus" @click="incrementCount">
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import { Getter, Mutation } from 'vuex-class';
-
-const PilotsCountInputProps = Vue.extend({
-  props: {
-    pilotsCountKey: {
-      type: String,
-      required: true,
-    },
-    maxPilotsCount: {
-      type: Number,
-      required: true,
-    },
-  }
-})
+import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
+import { Mutation } from 'vuex-class';
 
 @Component
-export default class PilotsCountInput extends PilotsCountInputProps {
-  @Getter getPilotsCount!: {
-    DJI: number,
-    sharkbyte: number,
-    analog: number,
-  };
-  @Mutation setPilotsCount!: (payload: { key: string, count: number }) => void;
+export default class PilotsCountInput extends Vue {
+  @Prop({
+    type: String,
+    required: true
+  }) pilotsCountKey!: string
+  @Prop({
+    type: Number,
+    required: true
+  }) maxPilotsCount!: number
 
+  @Mutation setPilotsCount!: (payload: { key: string, count: number }) => void;
 
   pilotsCount = 0;
   inputName = this.pilotsCountKey + 'PilotsCountInput';
 
-  onInputChanged(): void {
-    if (typeof this.pilotsCount != 'number') {
+  @Watch('pilotsCount')
+  onPilotsCountChanged(newCount: number): void {
+    if (typeof newCount != 'number') {
       return;
     }
-    this.setPilotsCount({ key: this.pilotsCountKey, count: this.pilotsCount });
+    this.setPilotsCount({ key: this.pilotsCountKey, count: newCount });
   }
 
   incrementCount(): void {
@@ -52,7 +43,6 @@ export default class PilotsCountInput extends PilotsCountInputProps {
       return;
     }
     this.pilotsCount++;
-    this.setPilotsCount({ key: this.pilotsCountKey, count: this.pilotsCount });
   }
 
   decrementCount(): void {
@@ -60,7 +50,6 @@ export default class PilotsCountInput extends PilotsCountInputProps {
       return;
     }
     this.pilotsCount--;
-    this.setPilotsCount({ key: this.pilotsCountKey, count: this.pilotsCount });
   }
 }
 </script>
